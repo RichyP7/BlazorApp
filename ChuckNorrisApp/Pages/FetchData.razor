@@ -1,0 +1,49 @@
+﻿@page "/fetchdata"
+@inject ChuckNorrisService chuckService
+
+<h1>Chuck norris jokes</h1>
+
+<p>The component gives you random chuck norris jokes </p>
+
+@if (chuck == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>
+
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chuck</th>
+                <th>Joke</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="@chuck.icon_url" asp-append-version="true" width="25" /></td>
+                <td>@chuck.value</td>
+            </tr>
+        </tbody>
+    </table>
+
+}
+<p>Lets have another one</p>
+
+<button class="btn btn-primary" @onclick="(async () => await GetNewChoke())">Get new</button>
+
+
+@code {
+    private ChuckResponse chuck;
+
+    protected override async Task OnInitializedAsync()
+    {
+        chuck = await chuckService.GetForecastAsync();
+    }
+    private async Task GetNewChoke()
+    {
+        chuck = await chuckService.GetForecastAsync();
+    }
+}
