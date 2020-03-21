@@ -1,0 +1,84 @@
+﻿@page "/fetchdata"
+@inject WeatherForeCastService foreCastService
+
+
+<h1>Wetter Vorhersage</h1>
+
+<p>Hier wird die Wettervorhersage für die nächsten Tage aufgelistet</p>
+
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Temp. (C)</th>
+                <th>Luftfeuchte (%)</th>
+                <th>Wind (m/s)</th>
+                <th>Wetter</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+            <tr>
+                <td>@forecast.DateRepresentation</td>
+                <td>@forecast.TemperatureC</td>
+                <td>@forecast.Humidity</td>
+                <td>@forecast.Wind</td>
+                <td>@forecast.Summary</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<WeatherForecast> forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await foreCastService.GetForecastAsync();
+    }
+
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
+
+        public int TemperatureC
+        {
+            get
+            {
+                return (TemperatureF-32)*5/9;
+            }
+        }
+        public int TemperatureF { get; set; }
+
+        public string Summary { get; set; }
+
+        public string Humidity { get; set; }
+        public int WindSpeed { get; set; }
+        public string WindDirection { get; set; }
+        public string  Wind
+        {
+            get { return String.Format("{0} m/s ({1})", WindSpeed, WindDirection); }
+        }
+        public string DateRepresentation
+        {
+            get
+            {
+                if(Date.Date == DateTime.Now.Date)
+                {
+                    return String.Format("Heute {0:HH }Uhr ", Date);
+                }
+                return String.Format("{0:d/M/yyyy HH }Uhr ", Date);
+            }
+        }
+
+    }
+}
