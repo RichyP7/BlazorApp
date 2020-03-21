@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static WeatherApp.Pages.FetchData;
 
@@ -10,16 +12,23 @@ namespace WeatherApp
     public class WeatherForeCastService
     {
         private readonly HttpClient client;
+        private readonly IConfiguration configuration;
+        private readonly Uri endpoint;
 
-        public WeatherForeCastService(HttpClient client)
+        public WeatherForeCastService(HttpClient client, IConfiguration configuration)
         {
             this.client = client;
+            this.configuration = configuration;
+            endpoint = new Uri(configuration["WeatherendPoint"]);
         }
 
         public async Task<IEnumerable<WeatherForecast>> GetForecastAsync()
         {
 
-            var weatherResult = await this.client.GetJsonAsync<WeatherForeCast7Timer>("http://www.7timer.info/bin/api.pl?lon=47.436919&lat=15.942476&product=civil&output=json");
+            var response = await this.client.GetAsync(endpoint.AbsoluteUri);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            WeatherForeCast7Timer weatherResult =  JsonSerializer.Deserialize<WeatherForeCast7Timer>(responseBody);
             var foreCasts = new List<WeatherForecast>();
             foreach (var item in weatherResult.dataseries)
             {
@@ -60,6 +69,11 @@ namespace WeatherApp
     }
     public class WeatherForeCast7Timer
     {
+        public WeatherForeCast7Timer()
+        {
+            dataseries = new List<WeatherForeCastTimePoint>();
+        }
+
         public string product { get; set; }
         public string init { get; set; }//datetimestring
         public IEnumerable<WeatherForeCastTimePoint> dataseries { get; set; }
