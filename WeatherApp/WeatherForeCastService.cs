@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static DeliveryApp.Pages.FetchData;
+using static WeatherApp.Pages.FetchData;
 
-namespace DeliveryApp
+namespace WeatherApp
 {
     public class WeatherForeCastService
     {
